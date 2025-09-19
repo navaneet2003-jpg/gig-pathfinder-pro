@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import VoiceAssistant from '@/components/common/VoiceAssistant';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,6 +25,33 @@ const languages = ['Hindi', 'English', 'Bengali', 'Tamil', 'Telugu', 'Marathi', 
 export default function WorkerRegistration() {
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const formRefs = {
+    name: useRef<HTMLInputElement>(null),
+    phone: useRef<HTMLInputElement>(null),
+    email: useRef<HTMLInputElement>(null),
+    address: useRef<HTMLTextAreaElement>(null),
+    aadhaar: useRef<HTMLInputElement>(null),
+    pan: useRef<HTMLInputElement>(null),
+    skills: useRef<HTMLDivElement>(null),
+  };
+
+  const handleFieldFocus = (fieldName: string) => {
+    const refMap: { [key: string]: React.RefObject<any> } = {
+      name: formRefs.name,
+      phone: formRefs.phone,
+      email: formRefs.email,
+      address: formRefs.address,
+      documents: formRefs.aadhaar,
+      skills: formRefs.skills,
+    };
+
+    const ref = refMap[fieldName];
+    if (ref?.current) {
+      ref.current.focus();
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
   
   const [formData, setFormData] = useState({
     name: '',
@@ -84,6 +112,7 @@ export default function WorkerRegistration() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light to-secondary-light p-6">
+      <VoiceAssistant onFieldFocus={handleFieldFocus} />
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" onClick={() => navigate('/worker/auth')}>
@@ -115,6 +144,7 @@ export default function WorkerRegistration() {
                     <Label htmlFor="name">Full Name *</Label>
                     <Input
                       id="name"
+                      ref={formRefs.name}
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Enter your full name"
@@ -138,6 +168,7 @@ export default function WorkerRegistration() {
                     <Label htmlFor="phone">Phone Number *</Label>
                     <Input
                       id="phone"
+                      ref={formRefs.phone}
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="Enter phone number"
@@ -149,6 +180,7 @@ export default function WorkerRegistration() {
                     <Label htmlFor="email">Email (Optional)</Label>
                     <Input
                       id="email"
+                      ref={formRefs.email}
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -185,6 +217,7 @@ export default function WorkerRegistration() {
                   <Label htmlFor="address">Address (Optional)</Label>
                   <Textarea
                     id="address"
+                    ref={formRefs.address}
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     placeholder="Full address"
@@ -202,6 +235,7 @@ export default function WorkerRegistration() {
                     <Label htmlFor="aadhaar">Aadhaar Number *</Label>
                     <Input
                       id="aadhaar"
+                      ref={formRefs.aadhaar}
                       value={formData.aadhaarNumber}
                       onChange={(e) => setFormData({ ...formData, aadhaarNumber: e.target.value })}
                       placeholder="Enter Aadhaar number"
@@ -286,7 +320,7 @@ export default function WorkerRegistration() {
 
                 <div className="space-y-3">
                   <Label>Skills</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  <div ref={formRefs.skills} className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {skills.map((skill) => (
                       <Button
                         key={skill}

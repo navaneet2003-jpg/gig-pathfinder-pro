@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Building2, Shield, Briefcase } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Users, Building2, Shield, Briefcase, Globe } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const userRoles = [
   {
@@ -37,6 +39,7 @@ const userRoles = [
 
 export default function Landing() {
   const navigate = useNavigate();
+  const { t, language, setLanguage } = useLanguage();
   const [selectedRole, setSelectedRole] = useState<string>('');
 
   const handleRoleSelect = (roleId: string) => {
@@ -44,22 +47,44 @@ export default function Landing() {
     navigate(`/${roleId}/auth`);
   };
 
+  const languageOptions = [
+    { value: 'en', label: 'English' },
+    { value: 'hi', label: 'हिंदी' },
+    { value: 'kn', label: 'ಕನ್ನಡ' },
+    { value: 'mr', label: 'मराठी' }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light to-secondary-light">
       <header className="p-6">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-primary">JobPortal</h1>
-          <p className="text-muted-foreground">Professional employment platform</p>
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-primary">{t('appName')}</h1>
+            <p className="text-muted-foreground">{t('subtitle')}</p>
+          </div>
+          <Select value={language} onValueChange={(value: any) => setLanguage(value)}>
+            <SelectTrigger className="w-[120px]">
+              <Globe className="h-4 w-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {languageOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-12">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-6 gradient-hero bg-clip-text text-transparent">
-            Welcome to JobPortal
+            {t('welcome')}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            A comprehensive platform connecting job seekers with employers through verified profiles and seamless verification processes
+            {t('description')}
           </p>
         </div>
 
@@ -78,11 +103,11 @@ export default function Landing() {
                   <div className="mx-auto mb-4 p-4 rounded-full bg-primary-light">
                     <IconComponent className="h-8 w-8 text-primary" />
                   </div>
-                  <CardTitle className="text-lg">{role.title}</CardTitle>
+                  <CardTitle className="text-lg">{t(`roles.${role.id}.title`)}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-center text-sm">
-                    {role.description}
+                    {t(`roles.${role.id}.description`)}
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -98,16 +123,16 @@ export default function Landing() {
             disabled={!selectedRole}
             onClick={() => selectedRole && handleRoleSelect(selectedRole)}
           >
-            Get Started
+            {t('getStarted')}
           </Button>
           <p className="text-sm text-muted-foreground">
-            Select your role above to continue
+            {t('selectRole')}
           </p>
         </div>
       </main>
 
       <footer className="p-6 text-center text-muted-foreground">
-        <p>&copy; 2024 JobPortal. Professional employment solutions.</p>
+        <p>{t('footer')}</p>
       </footer>
     </div>
   );
