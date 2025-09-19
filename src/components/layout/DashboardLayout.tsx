@@ -3,8 +3,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { LogOut, User, Bell } from 'lucide-react';
+import { LogOut, Bell, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import UserProfile from '@/components/common/UserProfile';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -48,12 +49,10 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
               <Button variant="ghost" size="icon">
                 <Bell className="h-4 w-4" />
               </Button>
-              
-              <div className="flex items-center space-x-2 text-sm">
-                <User className="h-4 w-4" />
-                <span className="hidden md:inline">{user?.name}</span>
-              </div>
-              
+              <Button variant="ghost" size="icon">
+                <Settings className="h-4 w-4" />
+              </Button>
+              <UserProfile />
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout

@@ -8,8 +8,9 @@ export interface BaseUser {
   phone: string;
   password: string;
   role: UserRole;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
+  trustScore?: number;
 }
 
 export interface KioskCentre extends BaseUser {
@@ -24,25 +25,27 @@ export interface VerificationAdmin extends BaseUser {
 
 export interface Worker extends BaseUser {
   role: 'worker';
-  birthdate?: Date;
+  birthdate?: string;
   location?: string;
   address?: string;
-  aadhaarNumber: string;
+  aadhaarNumber?: string;
   panNumber?: string;
   voterCard?: string;
-  preferredLanguage: string;
-  travellableDistance: number;
-  workCategory: string[];
-  skills: string[];
-  createdBy: 'self' | 'kiosk';
-  updatedBy: string;
-  gigLevel: number;
-  wageRange: { min: number; max: number };
+  preferredLanguage?: string;
+  travellableDistance?: number;
+  workCategory?: string[];
+  skills?: string[];
+  createdBy?: 'self' | 'kiosk' | string;
+  updatedBy?: string;
+  gigLevel?: number;
+  wageRange?: { min: number; max: number };
 }
 
 export interface Employer extends BaseUser {
   role: 'employer';
-  type: 'individual' | 'business';
+  type?: 'individual' | 'business';
+  location?: string;
+  address?: string;
   // Business-specific fields
   panCard?: string;
   gstinNumber?: string;
@@ -64,18 +67,29 @@ export interface Job {
   title: string;
   category: string;
   description: string;
-  timeEstimated: string;
+  skillsRequired: string[];
+  startDate: string;
+  duration: string;
   workersRequired: number;
   budgetRange: { min: number; max: number };
   status: 'open' | 'closed' | 'completed' | 'deleted';
-  createdAt: Date;
+  createdAt: string;
   applicants: string[];
+  location?: string;
 }
 
 export interface JobApplication {
   id: string;
   jobId: string;
   workerId: string;
-  status: 'applied' | 'accepted' | 'rejected' | 'completed';
-  appliedAt: Date;
+  status: 'applied' | 'accepted' | 'rejected' | 'completed' | 'withdrawn';
+  appliedAt: string;
+}
+
+export interface ProfileUpdateRequest {
+  id: string;
+  userId: string;
+  updates: any;
+  status: 'pending' | 'approved' | 'rejected';
+  requestedAt: string;
 }

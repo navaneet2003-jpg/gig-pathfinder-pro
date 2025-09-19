@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { UserRole, BaseUser, KioskCentre, VerificationAdmin, Worker, Employer } from '@/types/user';
+import { storageService } from '@/services/localStorage';
 
 type User = KioskCentre | VerificationAdmin | Worker | Employer;
 
@@ -8,84 +9,67 @@ interface AuthContextType {
   login: (email: string, password: string, role: UserRole) => Promise<boolean>;
   logout: () => void;
   register: (userData: any, role: UserRole) => Promise<boolean>;
+  updateProfile: (updates: any) => Promise<boolean>;
   isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock users for demonstration
-const mockUsers: User[] = [
-  {
-    id: '1',
-    name: 'Chaitanya',
-    email: 'chaitanya@gmail.com',
-    phone: '',
-    password: 'syntaacs',
-    role: 'admin',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  } as VerificationAdmin,
-  {
-    id: '2',
-    name: 'Anil Kumar',
-    email: 'anilkumar@gmail.com',
-    phone: '',
-    password: 'syntaacs',
-    role: 'admin',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  } as VerificationAdmin,
-];
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = async (email: string, password: string, role: UserRole): Promise<boolean> => {
-    // For admin, check hardcoded credentials
-    if (role === 'admin') {
-      const adminUser = mockUsers.find(
-        u => u.email === email && u.password === password && u.role === 'admin'
-      );
-      if (adminUser) {
-        setUser(adminUser);
-        return true;
+  // Load user from localStorage on app start
+  useEffect(() => {
+    const savedUserId = localStorage.getItem('currentUserId');
+    if (savedUserId) {
+      const userData = storageService.getUserById(savedUserId);
+      if (userData) {
+        setUser(userData);
       }
-      return false;
     }
+  }, []);
 
-    // For other roles, implement mock authentication
-    // In a real app, this would make API calls
-    const mockUser: User = {
-      id: Date.now().toString(),
-      name: 'Mock User',
-      email,
-      phone: '1234567890',
-      password,
-      role,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } as any;
-
-    setUser(mockUser);
-    return true;
+  const login = async (email: string, password: string, role: UserRole): Promise<boolean> => {
+    const userData = storageService.getUser(email, password, role);
+    if (userData) {
+      setUser(userData);
+      localStorage.setItem('currentUserId', userData.id);
+      return true;
+    }
+    return false;
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem('currentUserId');
   };
 
   const register = async (userData: any, role: UserRole): Promise<boolean> => {
-    // Mock registration - in real app, this would make API calls
-    const newUser: User = {
-      id: Date.now().toString(),
-      ...userData,
-      role,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } as any;
+    const success = storageService.createUser({ ...userData, role });
+    if (success) {
+      // Auto-login after registration
+      const newUser = storageService.getUser(userData.email, userData.password, role);
+      if (newUser) {
+        setUser(newUser);
+        localStorage.setItem('currentUserId', newUser.id);
+      }
+      return true;
+    }
+    return false;
+  };
 
-    setUser(newUser);
-    return true;
+  const updateProfile = async (updates: any): Promise<boolean> => {
+    if (!user) return false;
+    
+    const success = storageService.updateUser(user.id, updates);
+    if (success) {
+      const updatedUser = storageService.getUserById(user.id);
+      if (updatedUser) {
+        setUser(updatedUser);
+      }
+      return true;
+    }
+    return false;
   };
 
   return (
@@ -95,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         register,
+        updateProfile,
         isAuthenticated: !!user,
       }}
     >

@@ -15,6 +15,8 @@ import WorkerRegistration from "./pages/worker/WorkerRegistration";
 import DocumentUpload from "./pages/worker/DocumentUpload";
 import BackgroundCheck from "./pages/worker/BackgroundCheck";
 import QRGeneration from "./pages/worker/QRGeneration";
+import RegisterWorker from "./pages/kiosk/RegisterWorker";
+import ManageWorkers from "./pages/kiosk/ManageWorkers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +32,8 @@ const App = () => (
             <Route path="/" element={<Landing />} />
             <Route path="/:role/auth" element={<AuthPage />} />
             <Route path="/kiosk/dashboard" element={<KioskDashboard />} />
+            <Route path="/kiosk/register-worker" element={<RegisterWorker />} />
+            <Route path="/kiosk/manage-workers" element={<ManageWorkers />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/worker/dashboard" element={<WorkerDashboard />} />
             <Route path="/employer/dashboard" element={<EmployerDashboard />} />

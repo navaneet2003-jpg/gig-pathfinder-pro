@@ -1,10 +1,12 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { UserPlus, Users, FileCheck, QrCode, BarChart3 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { storageService } from '@/services/localStorage';
+import UserProfile from '@/components/common/UserProfile';
 
 export default function KioskDashboard() {
   const navigate = useNavigate();
@@ -100,7 +102,7 @@ export default function KioskDashboard() {
               variant="outline" 
               size="lg" 
               className="w-full"
-              onClick={() => navigate('/kiosk/generate-qr')}
+              onClick={() => navigate('/worker/qr-generation')}
             >
               <QrCode className="h-4 w-4 mr-2" />
               Generate QR Codes
